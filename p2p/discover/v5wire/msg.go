@@ -20,10 +20,10 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/ethereum/go-ethereum/common/mclock"
-	"github.com/ethereum/go-ethereum/p2p/enode"
-	"github.com/ethereum/go-ethereum/p2p/enr"
-	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/HorizenOfficial/go-ethereum/common/mclock"
+	"github.com/HorizenOfficial/go-ethereum/p2p/enode"
+	"github.com/HorizenOfficial/go-ethereum/p2p/enr"
+	"github.com/HorizenOfficial/go-ethereum/rlp"
 )
 
 // Packet is implemented by all message types.

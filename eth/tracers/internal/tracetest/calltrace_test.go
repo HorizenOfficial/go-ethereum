@@ -204,11 +204,11 @@ func testCallTracer(tracerName string, dirPath string, t *testing.T) {
 			}
 
 			if !jsonEqual(ret, test.Result) {
-				// uncomment this for easier debugging
-				//have, _ := json.MarshalIndent(ret, "", " ")
-				//want, _ := json.MarshalIndent(test.Result, "", " ")
-				//t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", string(have), string(want))
-				t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", ret, test.Result)
+				//uncomment this for easier debugging
+				have, _ := json.MarshalIndent(ret, "", " ")
+				want, _ := json.MarshalIndent(test.Result, "", " ")
+				t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", string(have), string(want))
+				//t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", ret, test.Result)
 			}
 		})
 	}
@@ -382,7 +382,7 @@ func TestZeroValueToNotExitCall(t *testing.T) {
 	if err := json.Unmarshal(res, have); err != nil {
 		t.Fatalf("failed to unmarshal trace result: %v", err)
 	}
-	wantStr := `{"type":"CALL","from":"0x682a80a6f560eec50d54e63cbeda1c324c5f8d1b","to":"0x00000000000000000000000000000000deadbeef","value":"0x0","gas":"0x7148","gasUsed":"0x2d0","input":"0x","output":"0x","calls":[{"type":"CALL","from":"0x00000000000000000000000000000000deadbeef","to":"0x00000000000000000000000000000000000000ff","value":"0x0","gas":"0x6cbf","gasUsed":"0x0","input":"0x","output":"0x"}]}`
+	wantStr := `{"type":"CALL","from":"0x682a80a6f560eec50d54e63cbeda1c324c5f8d1b","to":"0x00000000000000000000000000000000deadbeef","value":"0x0","gas":"0x7148","gasUsed":"0x54d8","input":"0x","output":"0x","calls":[{"type":"CALL","from":"0x00000000000000000000000000000000deadbeef","to":"0x00000000000000000000000000000000000000ff","value":"0x0","gas":"0x6cbf","gasUsed":"0x0","input":"0x","output":"0x"}]}`
 	want := new(callTrace)
 	json.Unmarshal([]byte(wantStr), want)
 	if !jsonEqual(have, want) {

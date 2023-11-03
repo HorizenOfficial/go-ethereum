@@ -18,10 +18,11 @@ package vm
 
 import (
 	"hash"
+	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/log"
+	"github.com/HorizenOfficial/go-ethereum/common"
+	"github.com/HorizenOfficial/go-ethereum/common/math"
+	"github.com/HorizenOfficial/go-ethereum/log"
 )
 
 // Config are the configuration options for the Interpreter
@@ -34,6 +35,12 @@ type Config struct {
 	JumpTable *JumpTable // EVM instruction table, automatically populated if unset
 
 	ExtraEips []int // Additional EIPS that are to be enabled
+
+	// specifies the initial call depth of the EVM (useful when the EVM is integrated into a separate execution context)
+	InitialDepth int
+	// TODO: mark external contracts via magic CodeHash instead of using a static list
+	ExternalContracts []common.Address
+	ExternalCallback  func(caller, callee common.Address, value *big.Int, input []byte, gas uint64, readOnly bool, depth int) (ret []byte, leftOverGas uint64, err error)
 }
 
 // ScopeContext contains the things that are per-call, such as stack and memory,

@@ -26,22 +26,22 @@ import (
 	"testing"
 	"unicode"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/eth/tracers"
-	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/ethereum/go-ethereum/tests"
+	"github.com/HorizenOfficial/go-ethereum/common"
+	"github.com/HorizenOfficial/go-ethereum/common/hexutil"
+	"github.com/HorizenOfficial/go-ethereum/common/math"
+	"github.com/HorizenOfficial/go-ethereum/core"
+	"github.com/HorizenOfficial/go-ethereum/core/rawdb"
+	"github.com/HorizenOfficial/go-ethereum/core/types"
+	"github.com/HorizenOfficial/go-ethereum/core/vm"
+	"github.com/HorizenOfficial/go-ethereum/crypto"
+	"github.com/HorizenOfficial/go-ethereum/eth/tracers"
+	"github.com/HorizenOfficial/go-ethereum/params"
+	"github.com/HorizenOfficial/go-ethereum/rlp"
+	"github.com/HorizenOfficial/go-ethereum/tests"
 
 	// Force-load native and js packages, to trigger registration
-	_ "github.com/ethereum/go-ethereum/eth/tracers/js"
-	_ "github.com/ethereum/go-ethereum/eth/tracers/native"
+	_ "github.com/HorizenOfficial/go-ethereum/eth/tracers/js"
+	_ "github.com/HorizenOfficial/go-ethereum/eth/tracers/native"
 )
 
 // To generate a new callTracer test, copy paste the makeTest method below into
@@ -204,11 +204,11 @@ func testCallTracer(tracerName string, dirPath string, t *testing.T) {
 			}
 
 			if !jsonEqual(ret, test.Result) {
-				// uncomment this for easier debugging
-				//have, _ := json.MarshalIndent(ret, "", " ")
-				//want, _ := json.MarshalIndent(test.Result, "", " ")
-				//t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", string(have), string(want))
-				t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", ret, test.Result)
+				//uncomment this for easier debugging
+				have, _ := json.MarshalIndent(ret, "", " ")
+				want, _ := json.MarshalIndent(test.Result, "", " ")
+				t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", string(have), string(want))
+				//t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", ret, test.Result)
 			}
 		})
 	}
@@ -382,7 +382,7 @@ func TestZeroValueToNotExitCall(t *testing.T) {
 	if err := json.Unmarshal(res, have); err != nil {
 		t.Fatalf("failed to unmarshal trace result: %v", err)
 	}
-	wantStr := `{"type":"CALL","from":"0x682a80a6f560eec50d54e63cbeda1c324c5f8d1b","to":"0x00000000000000000000000000000000deadbeef","value":"0x0","gas":"0x7148","gasUsed":"0x2d0","input":"0x","output":"0x","calls":[{"type":"CALL","from":"0x00000000000000000000000000000000deadbeef","to":"0x00000000000000000000000000000000000000ff","value":"0x0","gas":"0x6cbf","gasUsed":"0x0","input":"0x","output":"0x"}]}`
+	wantStr := `{"type":"CALL","from":"0x682a80a6f560eec50d54e63cbeda1c324c5f8d1b","to":"0x00000000000000000000000000000000deadbeef","value":"0x0","gas":"0x7148","gasUsed":"0x54d8","input":"0x","output":"0x","calls":[{"type":"CALL","from":"0x00000000000000000000000000000000deadbeef","to":"0x00000000000000000000000000000000000000ff","value":"0x0","gas":"0x6cbf","gasUsed":"0x0","input":"0x","output":"0x"}]}`
 	want := new(callTrace)
 	json.Unmarshal([]byte(wantStr), want)
 	if !jsonEqual(have, want) {

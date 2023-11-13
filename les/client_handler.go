@@ -20,13 +20,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/mclock"
-	"github.com/ethereum/go-ethereum/core/forkid"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/light"
-	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/trie/trienode"
+	"github.com/HorizenOfficial/go-ethereum/common"
+	"github.com/HorizenOfficial/go-ethereum/common/mclock"
+	"github.com/HorizenOfficial/go-ethereum/core/forkid"
+	"github.com/HorizenOfficial/go-ethereum/core/types"
+	"github.com/HorizenOfficial/go-ethereum/light"
+	"github.com/HorizenOfficial/go-ethereum/p2p"
+	"github.com/HorizenOfficial/go-ethereum/trie/trienode"
 )
 
 // clientHandler is responsible for receiving and processing all incoming server

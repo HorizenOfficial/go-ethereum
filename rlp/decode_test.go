@@ -27,7 +27,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/HorizenOfficial/go-ethereum/common/math"
 	"github.com/holiman/uint256"
 )
 

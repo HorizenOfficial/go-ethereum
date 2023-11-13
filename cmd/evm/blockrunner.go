@@ -23,10 +23,10 @@ import (
 	"os"
 	"sort"
 
-	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/eth/tracers/logger"
-	"github.com/ethereum/go-ethereum/tests"
+	"github.com/HorizenOfficial/go-ethereum/core/rawdb"
+	"github.com/HorizenOfficial/go-ethereum/core/vm"
+	"github.com/HorizenOfficial/go-ethereum/eth/tracers/logger"
+	"github.com/HorizenOfficial/go-ethereum/tests"
 	"github.com/urfave/cli/v2"
 )
 

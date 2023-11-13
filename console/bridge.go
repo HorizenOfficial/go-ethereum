@@ -25,13 +25,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/HorizenOfficial/go-ethereum/accounts/scwallet"
+	"github.com/HorizenOfficial/go-ethereum/accounts/usbwallet"
+	"github.com/HorizenOfficial/go-ethereum/common/hexutil"
+	"github.com/HorizenOfficial/go-ethereum/console/prompt"
+	"github.com/HorizenOfficial/go-ethereum/internal/jsre"
+	"github.com/HorizenOfficial/go-ethereum/rpc"
 	"github.com/dop251/goja"
-	"github.com/ethereum/go-ethereum/accounts/scwallet"
-	"github.com/ethereum/go-ethereum/accounts/usbwallet"
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/console/prompt"
-	"github.com/ethereum/go-ethereum/internal/jsre"
-	"github.com/ethereum/go-ethereum/rpc"
 )
 
 // bridge is a collection of JavaScript utility methods to bride the .js runtime

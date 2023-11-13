@@ -32,11 +32,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/metrics"
-	"github.com/ethereum/go-ethereum/p2p/enode"
-	"github.com/ethereum/go-ethereum/p2p/netutil"
+	"github.com/HorizenOfficial/go-ethereum/common"
+	"github.com/HorizenOfficial/go-ethereum/log"
+	"github.com/HorizenOfficial/go-ethereum/metrics"
+	"github.com/HorizenOfficial/go-ethereum/p2p/enode"
+	"github.com/HorizenOfficial/go-ethereum/p2p/netutil"
 )
 
 const (

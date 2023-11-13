@@ -17,7 +17,7 @@ override_dh_auto_build:
 	# one on the fly. However, we can't build it inside the go-ethereum folder as
 	# bootstrapping clashes with go modules, so build in a sibling folder.
 	#
-	# We're also shipping the bootstrapper as of Go 1.20 as it had minimum version
+	# We're also shipping the bootstrapper as of Go 1.21 as it had minimum version
 	# requirements opposed to older versions of Go.
 	(mv .goboot ../ && cd ../.goboot/src && ./make.bash)
 	(mv .go ../ && cd ../.go/src && GOROOT_BOOTSTRAP=`pwd`/../../.goboot ./make.bash)

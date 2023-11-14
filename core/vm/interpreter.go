@@ -17,6 +17,8 @@
 package vm
 
 import (
+	"math/big"
+
 	"github.com/HorizenOfficial/go-ethereum/common"
 	"github.com/HorizenOfficial/go-ethereum/common/math"
 	"github.com/HorizenOfficial/go-ethereum/crypto"
@@ -29,6 +31,12 @@ type Config struct {
 	NoBaseFee               bool      // Forces the EIP-1559 baseFee to 0 (needed for 0 price calls)
 	EnablePreimageRecording bool      // Enables recording of SHA3/keccak preimages
 	ExtraEips               []int     // Additional EIPS that are to be enabled
+
+	// specifies the initial call depth of the EVM (useful when the EVM is integrated into a separate execution context)
+	InitialDepth int
+	// TODO: mark external contracts via magic CodeHash instead of using a static list
+	ExternalContracts []common.Address
+	ExternalCallback  func(caller, callee common.Address, value *big.Int, input []byte, gas uint64, readOnly bool, depth int) (ret []byte, leftOverGas uint64, err error)
 }
 
 // ScopeContext contains the things that are per-call, such as stack and memory,

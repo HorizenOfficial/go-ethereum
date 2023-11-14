@@ -55,6 +55,21 @@ func (evm *EVM) precompile(addr common.Address) (PrecompiledContract, bool) {
 	return p, ok
 }
 
+func (evm *EVM) isExternalContract(addr common.Address) bool {
+	// TODO: use a map to speed up lookup? the list is gonna remain small at all times though
+	for _, external := range evm.Config.ExternalContracts {
+		if external == addr {
+			return true
+		}
+	}
+	return false
+}
+
+func (evm *EVM) invokeExternalCallback(caller, callee common.Address, value *big.Int, input []byte, gas uint64, readOnly bool) (ret []byte, leftOverGas uint64, err error) {
+	// pass only the part of the call-depth that was exclusively within the EVM
+	return evm.Config.ExternalCallback(caller, callee, value, input, gas, readOnly, evm.depth-evm.Config.InitialDepth)
+}
+
 // BlockContext provides the EVM with auxiliary information. Once provided
 // it shouldn't be modified.
 type BlockContext struct {
@@ -132,6 +147,7 @@ func NewEVM(blockCtx BlockContext, txCtx TxContext, statedb StateDB, chainConfig
 		Config:      config,
 		chainConfig: chainConfig,
 		chainRules:  chainConfig.Rules(blockCtx.BlockNumber, blockCtx.Random != nil, blockCtx.Time),
+		depth:       config.InitialDepth,
 	}
 	evm.interpreter = NewEVMInterpreter(evm)
 	return evm
@@ -183,10 +199,11 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	}
 	snapshot := evm.StateDB.Snapshot()
 	p, isPrecompile := evm.precompile(addr)
+	isExternal := evm.isExternalContract(addr)
 	debug := evm.Config.Tracer != nil
 
 	if !evm.StateDB.Exist(addr) {
-		if !isPrecompile && evm.chainRules.IsEIP158 && value.Sign() == 0 {
+		if !isPrecompile && !isExternal && evm.chainRules.IsEIP158 && value.Sign() == 0 {
 			// Calling a non existing account, don't do anything, but ping the tracer
 			if debug {
 				if evm.depth == 0 {
@@ -201,10 +218,12 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 		}
 		evm.StateDB.CreateAccount(addr)
 	}
-	evm.Context.Transfer(evm.StateDB, caller.Address(), addr, value)
+	if !isExternal {
+		evm.Context.Transfer(evm.StateDB, caller.Address(), addr, value)
+	}
 
-	// Capture the tracer start/end events in debug mode
-	if debug {
+	// Capture the tracer start/end events in debug mode. External contracts handle tracing themselves
+	if debug && !isExternal {
 		if evm.depth == 0 {
 			evm.Config.Tracer.CaptureStart(evm, caller.Address(), addr, false, input, gas, value)
 			defer func(startGas uint64) { // Lazy evaluation of the parameters
@@ -221,6 +240,8 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 
 	if isPrecompile {
 		ret, gas, err = RunPrecompiledContract(p, input, gas)
+	} else if isExternal {
+		ret, gas, err = evm.invokeExternalCallback(caller.Address(), addr, value, input, gas, evm.interpreter.readOnly)
 	} else {
 		// Initialise a new contract and set the code that is to be used by the EVM.
 		// The contract is a scoped environment for this execution context only.
@@ -284,6 +305,10 @@ func (evm *EVM) CallCode(caller ContractRef, addr common.Address, input []byte, 
 	// It is allowed to call precompiles, even via delegatecall
 	if p, isPrecompile := evm.precompile(addr); isPrecompile {
 		ret, gas, err = RunPrecompiledContract(p, input, gas)
+	} else if evm.isExternalContract(addr) {
+		// TODO: this should execute code of "addr" but use caller as "this" and "caller"
+		//ret, gas, err = evm.Config.ExternalCallback(caller.Address(), addr, value, input, gas)
+		return nil, gas, ErrUnsupportedCall
 	} else {
 		addrCopy := addr
 		// Initialise a new contract and set the code that is to be used by the EVM.
@@ -329,6 +354,8 @@ func (evm *EVM) DelegateCall(caller ContractRef, addr common.Address, input []by
 	// It is allowed to call precompiles, even via delegatecall
 	if p, isPrecompile := evm.precompile(addr); isPrecompile {
 		ret, gas, err = RunPrecompiledContract(p, input, gas)
+	} else if evm.isExternalContract(addr) {
+		return nil, gas, ErrUnsupportedCall
 	} else {
 		addrCopy := addr
 		// Initialise a new contract and make initialise the delegate values
@@ -368,8 +395,9 @@ func (evm *EVM) StaticCall(caller ContractRef, addr common.Address, input []byte
 	// future scenarios
 	evm.StateDB.AddBalance(addr, big0)
 
+	isExternal := evm.isExternalContract(addr)
 	// Invoke tracer hooks that signal entering/exiting a call frame
-	if evm.Config.Tracer != nil {
+	if evm.Config.Tracer != nil && !isExternal {
 		evm.Config.Tracer.CaptureEnter(STATICCALL, caller.Address(), addr, input, gas, nil)
 		defer func(startGas uint64) {
 			evm.Config.Tracer.CaptureExit(ret, startGas-gas, err)
@@ -378,6 +406,8 @@ func (evm *EVM) StaticCall(caller ContractRef, addr common.Address, input []byte
 
 	if p, isPrecompile := evm.precompile(addr); isPrecompile {
 		ret, gas, err = RunPrecompiledContract(p, input, gas)
+	} else if isExternal {
+		ret, gas, err = evm.invokeExternalCallback(caller.Address(), addr, common.Big0, input, gas, true)
 	} else {
 		// At this point, we use a copy of address. If we don't, the go compiler will
 		// leak the 'contract' to the outer scope, and make allocation for 'contract'

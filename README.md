@@ -6,4 +6,4 @@ Its core EVM engine  is used as the default EVM implementation inside the fully 
 Check [CHANGELOG.md](CHANGELOG.md) for a detailed list of the changes.
 
 
-Original ethereum readme file is [has been moved here](ETHEREUM_README.md) for reference.
+Original ethereum readme file [has been moved here](ETHEREUM_README.md) for reference.

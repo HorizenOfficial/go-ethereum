@@ -1,9 +1,21 @@
-## Horizen Go Ethereum
+# Horizen Go-Ethereum
 
-Horizen Go Ethereum is a fork of the original [GoLang implementation](https://github.com/ethereum/go-ethereum) of the Ethereum protocol.\
-Its core EVM engine  is used as the default EVM implementation inside the fully EVM-compatible Horizen [EON Sidechain](https://github.com/HorizenOfficial/eon).
+This project is a fork of [Go-Ethereum (geth)](https://github.com/ethereum/), the official Golang implementation of 
+Ethereum protocol.
 
-Check [CHANGELOG.md](CHANGELOG.md) for a detailed list of the changes.
+The Ethereum Virtual Machine is included in [Horizen Sidechain SDK](https://github.com/HorizenOfficial/Sidechains-SDK),
+through [libevm](https://github.com/HorizenOfficial/libevm) library.
 
+Current used Go-Ethereum version is 1.13.4 [Archanes](https://github.com/ethereum/go-ethereum/releases/tag/v1.13.4), 
+with the following modifications:
+- Go version is 1.21
+- Module names changed from `ethereum` to `HorizenOfficial`
+- Added support for calling Sidechain Native Smart Contracts (a.k.a. external Smart Contracts) from Ethereum smart contracts.
+  Modified files:
+  - `core/vm/errors.go`
+  - `core/vm/evm.go`
+  - `core/vm/instructions.go`
+  - `core/vm/interpreter.go`
 
-Original ethereum readme file [has been moved here](ETHEREUM_README.md) for reference.
+## Build
+See [original Go-Ethereum README](./ETHEREUM_README.md)

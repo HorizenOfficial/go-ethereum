@@ -17,13 +17,13 @@
 package ethtest
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"reflect"
 	"strings"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/HorizenOfficial/go-ethereum/common"
 	"github.com/HorizenOfficial/go-ethereum/core/types"
 	"github.com/HorizenOfficial/go-ethereum/crypto"
@@ -31,6 +31,7 @@ import (
 	"github.com/HorizenOfficial/go-ethereum/internal/utesting"
 	"github.com/HorizenOfficial/go-ethereum/p2p"
 	"github.com/HorizenOfficial/go-ethereum/p2p/rlpx"
+	"github.com/davecgh/go-spew/spew"
 )
 
 var (
@@ -61,10 +62,10 @@ func (s *Suite) dial() (*Conn, error) {
 	}
 	// set default p2p capabilities
 	conn.caps = []p2p.Cap{
-		{Name: "eth", Version: 66},
 		{Name: "eth", Version: 67},
+		{Name: "eth", Version: 68},
 	}
-	conn.ourHighestProtoVersion = 67
+	conn.ourHighestProtoVersion = 68
 	return &conn, nil
 }
 
@@ -184,7 +185,7 @@ loop:
 	}
 	// make sure eth protocol version is set for negotiation
 	if c.negotiatedProtoVersion == 0 {
-		return nil, fmt.Errorf("eth protocol version must be set in Conn")
+		return nil, errors.New("eth protocol version must be set in Conn")
 	}
 	if status == nil {
 		// default status message
@@ -235,8 +236,8 @@ func (c *Conn) readAndServe(chain *Chain, timeout time.Duration) Message {
 				return errorf("could not get headers for inbound header request: %v", err)
 			}
 			resp := &BlockHeaders{
-				RequestId:          msg.ReqID(),
-				BlockHeadersPacket: eth.BlockHeadersPacket(headers),
+				RequestId:           msg.ReqID(),
+				BlockHeadersRequest: eth.BlockHeadersRequest(headers),
 			}
 			if err := c.Write(resp); err != nil {
 				return errorf("could not write to connection: %v", err)
@@ -265,7 +266,7 @@ func (c *Conn) headersRequest(request *GetBlockHeaders, chain *Chain, reqID uint
 	if !ok {
 		return nil, fmt.Errorf("unexpected message received: %s", pretty.Sdump(msg))
 	}
-	headers := []*types.Header(resp.BlockHeadersPacket)
+	headers := []*types.Header(resp.BlockHeadersRequest)
 	return headers, nil
 }
 
@@ -357,9 +358,15 @@ func (s *Suite) waitAnnounce(conn *Conn, blockAnnouncement *NewBlock) error {
 				return fmt.Errorf("wrong block hash in announcement: expected %v, got %v", blockAnnouncement.Block.Hash(), hashes[0].Hash)
 			}
 			return nil
-		case *NewPooledTransactionHashes:
-			// ignore tx announcements from previous tests
+
+		// ignore tx announcements from previous tests
+		case *NewPooledTransactionHashes66:
 			continue
+		case *NewPooledTransactionHashes:
+			continue
+		case *Transactions:
+			continue
+
 		default:
 			return fmt.Errorf("unexpected: %s", pretty.Sdump(msg))
 		}
@@ -371,7 +378,7 @@ func (s *Suite) waitForBlockImport(conn *Conn, block *types.Block) error {
 	conn.SetReadDeadline(time.Now().Add(20 * time.Second))
 	// create request
 	req := &GetBlockHeaders{
-		GetBlockHeadersPacket: &eth.GetBlockHeadersPacket{
+		GetBlockHeadersRequest: &eth.GetBlockHeadersRequest{
 			Origin: eth.HashOrNumber{Hash: block.Hash()},
 			Amount: 1,
 		},
@@ -596,8 +603,8 @@ func (s *Suite) hashAnnounce() error {
 			pretty.Sdump(blockHeaderReq))
 	}
 	err = sendConn.Write(&BlockHeaders{
-		RequestId:          blockHeaderReq.ReqID(),
-		BlockHeadersPacket: eth.BlockHeadersPacket{nextBlock.Header()},
+		RequestId:           blockHeaderReq.ReqID(),
+		BlockHeadersRequest: eth.BlockHeadersRequest{nextBlock.Header()},
 	})
 	if err != nil {
 		return fmt.Errorf("failed to write to connection: %v", err)

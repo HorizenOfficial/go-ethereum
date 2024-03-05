@@ -24,7 +24,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/HorizenOfficial/go-ethereum/common/hexutil"
 	"github.com/HorizenOfficial/go-ethereum/common/mclock"
 	"github.com/HorizenOfficial/go-ethereum/crypto"
@@ -32,6 +31,7 @@ import (
 	"github.com/HorizenOfficial/go-ethereum/log"
 	"github.com/HorizenOfficial/go-ethereum/p2p/enode"
 	"github.com/HorizenOfficial/go-ethereum/p2p/enr"
+	"github.com/davecgh/go-spew/spew"
 )
 
 var signingKeyForTesting, _ = crypto.ToECDSA(hexutil.MustDecode("0xdc599867fc513f8f5e2c2c9c489cde5e71362d1d9ec6e693e0de063236ed1240"))
@@ -439,7 +439,7 @@ func testNodes(keys []*ecdsa.PrivateKey) []*enode.Node {
 type mapResolver map[string]string
 
 func newMapResolver(maps ...map[string]string) mapResolver {
-	mr := make(mapResolver)
+	mr := make(mapResolver, len(maps))
 	for _, m := range maps {
 		mr.add(m)
 	}

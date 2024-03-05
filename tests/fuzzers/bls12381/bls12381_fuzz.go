@@ -26,11 +26,12 @@ import (
 	"io"
 	"math/big"
 
+	"github.com/HorizenOfficial/go-ethereum/common"
+	"github.com/HorizenOfficial/go-ethereum/crypto/bls12381"
+	"github.com/consensys/gnark-crypto/ecc"
 	gnark "github.com/consensys/gnark-crypto/ecc/bls12-381"
 	"github.com/consensys/gnark-crypto/ecc/bls12-381/fp"
 	"github.com/consensys/gnark-crypto/ecc/bls12-381/fr"
-	"github.com/HorizenOfficial/go-ethereum/common"
-	"github.com/HorizenOfficial/go-ethereum/crypto/bls12381"
 	blst "github.com/supranational/blst/bindings/go"
 )
 
@@ -198,7 +199,7 @@ func FuzzCrossG1MultiExp(data []byte) int {
 		}
 		gethScalars = append(gethScalars, s)
 		var gnarkScalar = &fr.Element{}
-		gnarkScalar = gnarkScalar.SetBigInt(s).FromMont()
+		gnarkScalar = gnarkScalar.SetBigInt(s)
 		gnarkScalars = append(gnarkScalars, *gnarkScalar)
 
 		gethPoints = append(gethPoints, new(bls12381.PointG1).Set(kp1))
@@ -217,7 +218,7 @@ func FuzzCrossG1MultiExp(data []byte) int {
 
 	// gnark multi exp
 	cp := new(gnark.G1Affine)
-	cp.MultiExp(gnarkPoints, gnarkScalars)
+	cp.MultiExp(gnarkPoints, gnarkScalars, ecc.MultiExpConfig{})
 
 	// compare result
 	if !(bytes.Equal(cp.Marshal(), g1.ToBytes(&kp))) {

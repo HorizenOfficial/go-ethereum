@@ -34,12 +34,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/docker/docker/pkg/reexec"
 	"github.com/HorizenOfficial/go-ethereum/log"
 	"github.com/HorizenOfficial/go-ethereum/node"
 	"github.com/HorizenOfficial/go-ethereum/p2p"
 	"github.com/HorizenOfficial/go-ethereum/p2p/enode"
 	"github.com/HorizenOfficial/go-ethereum/rpc"
+	"github.com/docker/docker/pkg/reexec"
 	"github.com/gorilla/websocket"
 )
 
@@ -428,9 +428,11 @@ func execP2PNode() {
 
 	// Send status to the host.
 	statusJSON, _ := json.Marshal(status)
-	if _, err := http.Post(statusURL, "application/json", bytes.NewReader(statusJSON)); err != nil {
+	resp, err := http.Post(statusURL, "application/json", bytes.NewReader(statusJSON))
+	if err != nil {
 		log.Crit("Can't post startup info", "url", statusURL, "err", err)
 	}
+	resp.Body.Close()
 	if stackErr != nil {
 		os.Exit(1)
 	}

@@ -21,8 +21,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/HorizenOfficial/go-ethereum/common"
+	"github.com/davecgh/go-spew/spew"
 )
 
 // typeWithoutStringer is a alias for the Type type which simply doesn't implement
@@ -364,5 +364,12 @@ func TestGetTypeSize(t *testing.T) {
 		if result != data.typSize {
 			t.Errorf("case %d type %q: get type size error: actual: %d expected: %d", i, data.typ, result, data.typSize)
 		}
+	}
+}
+
+func TestNewFixedBytesOver32(t *testing.T) {
+	_, err := NewType("bytes4096", "", nil)
+	if err == nil {
+		t.Errorf("fixed bytes with size over 32 is not spec'd")
 	}
 }

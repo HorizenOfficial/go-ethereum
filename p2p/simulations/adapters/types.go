@@ -25,7 +25,6 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/docker/docker/pkg/reexec"
 	"github.com/HorizenOfficial/go-ethereum/crypto"
 	"github.com/HorizenOfficial/go-ethereum/log"
 	"github.com/HorizenOfficial/go-ethereum/node"
@@ -33,16 +32,16 @@ import (
 	"github.com/HorizenOfficial/go-ethereum/p2p/enode"
 	"github.com/HorizenOfficial/go-ethereum/p2p/enr"
 	"github.com/HorizenOfficial/go-ethereum/rpc"
+	"github.com/docker/docker/pkg/reexec"
 	"github.com/gorilla/websocket"
 )
 
 // Node represents a node in a simulation network which is created by a
 // NodeAdapter, for example:
 //
-// * SimNode    - An in-memory node
-// * ExecNode   - A child process node
-// * DockerNode - A Docker container node
-//
+//   - SimNode, an in-memory node in the same process
+//   - ExecNode, a child process node
+//   - DockerNode, a node running in a Docker container
 type Node interface {
 	// Addr returns the node's address (e.g. an Enode URL)
 	Addr() []byte

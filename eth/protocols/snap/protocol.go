@@ -21,7 +21,7 @@ import (
 	"fmt"
 
 	"github.com/HorizenOfficial/go-ethereum/common"
-	"github.com/HorizenOfficial/go-ethereum/core/state/snapshot"
+	"github.com/HorizenOfficial/go-ethereum/core/types"
 	"github.com/HorizenOfficial/go-ethereum/rlp"
 )
 
@@ -104,7 +104,7 @@ func (p *AccountRangePacket) Unpack() ([]common.Hash, [][]byte, error) {
 		accounts = make([][]byte, len(p.Accounts))
 	)
 	for i, acc := range p.Accounts {
-		val, err := snapshot.FullAccountRLP(acc.Body)
+		val, err := types.FullAccountRLP(acc.Body)
 		if err != nil {
 			return nil, nil, fmt.Errorf("invalid account %x: %v", acc.Body, err)
 		}
